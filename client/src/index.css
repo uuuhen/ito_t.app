@@ -29,17 +29,27 @@
 /* ── Reset ─────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
-  height: 100%;
+html {
+  /* dvh: キーボード表示時に動的に縮む実際の表示高さを使う */
+  height: -webkit-fill-available;
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-jp);
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  /* スマホのキーボード展開時もスクロールで入力欄に届けるようにする */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-#root { height: 100%; display: flex; flex-direction: column; }
+#root { min-height: 100%; display: flex; flex-direction: column; }
 
 /* ── Scrollbar ──────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
