@@ -83,7 +83,7 @@ export default function App() {
           break;
 
         case 'GAME_STARTED':
-          setMyNumber(null);
+          setMyNumber(payload.yourNumber ?? null);
           setChat([]);
           setGameResult(null);
           setProposed(payload.proposedOrder || []);
@@ -95,10 +95,6 @@ export default function App() {
             proposedOrder: payload.proposedOrder,
           }));
           setScreen('GAME');
-          break;
-
-        case 'YOUR_NUMBER':
-          setMyNumber(payload.number);
           break;
 
         case 'CHAT_MSG':
@@ -176,6 +172,10 @@ export default function App() {
     reset: () => {
       send('RESET', { userId, roomId: room?.roomId });
     },
+    restart: () => {
+      // WAITING に戻らず即座に次のゲームを開始する
+      send('RESTART_GAME', { userId, roomId: room?.roomId });
+    },
     leave: () => {
       send('LEAVE', { userId, roomId: room?.roomId });
       setScreen('TOP');
@@ -237,6 +237,7 @@ export default function App() {
           result={gameResult}
           isLeader={isLeader}
           onReset={actions.reset}
+          onRestart={actions.restart}
           onLeave={actions.leave}
         />
       )}
