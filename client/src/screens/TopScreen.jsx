@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import styles from './TopScreen.module.css';
 
+// スマホでキーボード表示時に入力欄が隠れないようスクロール
+function handleFocus(e) {
+  setTimeout(() => {
+    e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 300); // キーボードアニメーション完了後
+}
+
 export default function TopScreen({ error, onCreateRoom, onJoinRoom }) {
   const [tab, setTab]         = useState('join'); // 'create' | 'join'
   const [name, setName]       = useState('');
@@ -51,6 +58,7 @@ export default function TopScreen({ error, onCreateRoom, onJoinRoom }) {
               placeholder="未入力でランダム生成"
               value={name}
               onChange={e => setName(e.target.value)}
+              onFocus={handleFocus}
               maxLength={20}
             />
           </div>
@@ -62,6 +70,7 @@ export default function TopScreen({ error, onCreateRoom, onJoinRoom }) {
               placeholder="例：abc123"
               value={roomId}
               onChange={e => setRoomId(e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10))}
+              onFocus={handleFocus}
             />
           </div>
 
