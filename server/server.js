@@ -260,6 +260,40 @@ wss.on('connection', ws => {
         break;
       }
 
+      // ── RESTART_GAME ─────────────────────────────────────────────
+      // 結果画面から即座に次のゲームを開始する（WAITING を挟まない）
+      case 'RESTART_GAME': {
+        const { userId, roomId } = payload;
+        const room = rooms.get(roomId);
+        if (!room || room.leaderId !== userId) return;
+
+        // 新しい数字を配布
+        const nums = shuffle(Array.from({ length: 99 }, (_, i) => i + 1));
+        room.players.forEach((p, i) => { p.number = nums[i]; });
+
+        const chosenTopic = DEFAULT_TOPICS[Math.floor(Math.random() * DEFAULT_TOPICS.length)];
+        room.topic = chosenTopic;
+        room.status = 'PLAYING';
+        room.chat = [];
+        room.proposedOrder = room.players.map(p => p.userId);
+
+        // 各プレイヤーに個別に数字を送信
+        room.players.forEach(p => {
+          sendToUser(p.userId, { type: 'YOUR_NUMBER', payload: { number: p.number } });
+        });
+
+        // ゲーム開始をブロードキャスト
+        broadcastRoom(roomId, {
+          type: 'GAME_STARTED',
+          payload: {
+            topic: room.topic,
+            players: room.players.map(p => ({ userId: p.userId, name: p.name })),
+            proposedOrder: room.proposedOrder,
+          },
+        });
+        break;
+      }
+
       // ── RESET ────────────────────────────────────────────────────────────
       case 'RESET': {
         const { userId, roomId } = payload;
